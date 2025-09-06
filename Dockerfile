@@ -25,4 +25,6 @@ HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD curl -fsS http://127.0.0
 USER appuser
 
 # Streamlit起動
-CMD ["streamlit", "run", "app.py", "--server.address=0.0.0.0", "--server.port=8501"]
+# Use shell form so ${PORT} (set by App Runner) can override the default 8501.
+# Also enable headless mode for container environments.
+CMD streamlit run app.py --server.address=0.0.0.0 --server.port=${PORT:-8501} --server.headless=true
