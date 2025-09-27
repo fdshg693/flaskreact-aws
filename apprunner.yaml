@@ -1,21 +1,25 @@
 version: 1.0
 runtime: python311
-
 build:
   commands:
-    build:
+    pre-build:
+      - wget -c https://s3.amazonaws.com/amzn-s3-demo-bucket/test-lib.tar.gz -O - | tar -xz
+    build:        
+      - pip3 install pipenv
+      - pipenv install
+    post-build:
+      - python3 manage.py test
+  env:
+    - name: DJANGO_SETTINGS_MODULE
+      value: "django_apprunner.settings"
 
 run:
   runtime-version: 3.11
-  pre-run:
-    # ここで本番用に依存を入れる（新ビルド方式ではここが“残る”）
-    - pip3 install -r requirements.txt
-  # Use a shell so $PORT is expanded at runtime for App Runner source deployments
-  command: sh -c 'gunicorn "app:app" --bind 0.0.0.0:${PORT:-8080}'
-  # port は省略可（既定 8080、環境変数 PORT にも同値が渡される）
-  # network:
-  #   port: 8080
-  #   env: MY_APP_PORT  # 併せて別名で渡す例
-  env:
-    - name: FLASK_ENV
-      value: "production"
+  pre-run:  
+    - pip3 install pipenv
+    - pipenv install
+    - python3 copy-global-files.py
+  command: pipenv run gunicorn django_apprunner.wsgi --log-file -
+  network: 
+    port: 8000
+    env: MY_APP_PORT  
