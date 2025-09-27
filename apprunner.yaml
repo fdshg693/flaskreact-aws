@@ -2,16 +2,6 @@ version: 1.0
 runtime: python311
 build:
   commands:
-    pre-build:
-      - wget -c https://s3.amazonaws.com/amzn-s3-demo-bucket/test-lib.tar.gz -O - | tar -xz
-    build:        
-      - pip3 install pipenv
-      - pipenv install
-    post-build:
-      - python3 manage.py test
-  env:
-    - name: DJANGO_SETTINGS_MODULE
-      value: "django_apprunner.settings"
 
 run:
   runtime-version: 3.11
