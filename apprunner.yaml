@@ -10,7 +10,8 @@ run:
   pre-run:
     # ここで本番用に依存を入れる（新ビルド方式ではここが“残る”）
     - pip3 install -r requirements.txt
-  command: gunicorn "app:app" --bind 0.0.0.0:$PORT
+  # Use a shell so $PORT is expanded at runtime for App Runner source deployments
+  command: sh -c 'gunicorn "app:app" --bind 0.0.0.0:${PORT:-8080}'
   # port は省略可（既定 8080、環境変数 PORT にも同値が渡される）
   # network:
   #   port: 8080

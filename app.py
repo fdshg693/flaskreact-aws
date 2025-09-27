@@ -26,5 +26,6 @@ def healthz():
 
 if __name__ == "__main__":
 	# Local run: respect PORT like on Fly/App Runner; default 8501 to match previous config
-	port = int(os.environ.get("PORT", "8501"))
+	# Default to 8080 which is what App Runner expects by default
+	port = int(os.environ.get("PORT", "8080"))
 	app.run(host="0.0.0.0", port=port)
