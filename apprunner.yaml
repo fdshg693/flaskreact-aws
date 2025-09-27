@@ -1,0 +1,22 @@
+version: 1.0
+runtime: python311
+
+build:
+  commands:
+    build:
+      # （任意）テストやLintのために入れる。最終イメージには残らない点に注意。
+      - pip3 install -r requirements.txt
+
+run:
+  runtime-version: 3.11
+  pre-run:
+    # ここで本番用に依存を入れる（新ビルド方式ではここが“残る”）
+    - pip3 install -r requirements.txt
+  command: gunicorn "app:app" --bind 0.0.0.0:$PORT
+  # port は省略可（既定 8080、環境変数 PORT にも同値が渡される）
+  # network:
+  #   port: 8080
+  #   env: MY_APP_PORT  # 併せて別名で渡す例
+  env:
+    - name: FLASK_ENV
+      value: "production"
