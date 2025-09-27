@@ -16,15 +16,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 # アプリ本体
 COPY . .
 
-# 8501を外に出す
 EXPOSE 8501
 
-# ヘルスチェック（素朴にトップを叩く）
-HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD curl -fsS http://127.0.0.1:8501/ || exit 1
+# ヘルスチェック（/healthz を叩く）
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD curl -fsS http://127.0.0.1:8501/healthz || exit 1
 
 USER appuser
 
-# Streamlit起動
-# Use shell form so ${PORT} (set by App Runner) can override the default 8501.
-# Also enable headless mode for container environments.
-CMD streamlit run app.py --server.address=0.0.0.0 --server.port=${PORT:-8501} --server.headless=true
+# Flask(Gunicorn)起動
+# ${PORT} が与えられればそれを使い、なければ 8501 にフォールバック
+ENV GUNICORN_CMD_ARGS="--bind=0.0.0.0:${PORT:-8501} --workers=2 --threads=4 --timeout=60"
+CMD sh -c 'exec gunicorn app:app --bind 0.0.0.0:${PORT:-8501} --workers ${WEB_CONCURRENCY:-2} --threads ${WEB_THREADS:-4} --timeout ${WEB_TIMEOUT:-60}'
