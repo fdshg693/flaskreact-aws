@@ -4,8 +4,6 @@ runtime: python311
 build:
   commands:
     build:
-      # （任意）テストやLintのために入れる。最終イメージには残らない点に注意。
-      - pip3 install -r requirements.txt
 
 run:
   runtime-version: 3.11
